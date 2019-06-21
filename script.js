@@ -3,15 +3,15 @@
 const canvas = document.getElementById('mandelbrot');
 const ctx = canvas.getContext('2d');
 
-let zoom = 300;
-let panX = 2;
-let panY = 1.5;
+let zoom = 3000;
+let panX = 0.7;
+let panY = 0.6;
 
 // Computational constants
-const maxIterations = 500;
+const maxIterations = 1000;
 
 const drawPixel = (x, y, color) => {
-  ctx.fillStyle = `rgba(${color.r},${color.g},${color.g},1`;
+  ctx.fillStyle = `hsl(${color.h},${color.s}%,${color.l}%`;
   ctx.fillRect(x, y, 1, 1);
 };
 
@@ -30,15 +30,15 @@ function calculateEscapeValue(x, y) {
     cX = newCx;
     cY = newCy;
 
-  }
+    if ((cX * cY) > 5) {
+      // Number is outside of the set if it has not escaped
+      return i / maxIterations * 100;
+    }
 
-  if ((cX * cY) < 5) {
-    // Number is within the set if it has escaped
-    return true;
   }
 
   // Number is not within the set if it has not escaped
-  return false;
+  return 0;
 
 }
 
@@ -47,10 +47,10 @@ for (let i = 0; i < canvas.width; i++) {
 
     const escValue = calculateEscapeValue(i/zoom - panX, j/zoom - panY);
 
-    if (escValue) {
-      drawPixel(i, j, {
-        r: 0, g: 0, b: 0
-      })
+    if (escValue === 0) {
+      drawPixel(i, j, { h: 0, s: 0, l: 0 });
+    } else {
+      drawPixel(i, j, { h: 0, s: 100, l: escValue });
     }
 
   }
