@@ -3,12 +3,12 @@
 const canvas = document.getElementById('mandelbrot');
 const ctx = canvas.getContext('2d');
 
-let zoom = 200;
-let panX = 1.5;
-let panY = 1;
+let zoom = 300;
+let panX = 2;
+let panY = 1.5;
 
 // Computational constants
-const maxIterations = 100;
+const maxIterations = 500;
 
 const drawPixel = (x, y, color) => {
   ctx.fillStyle = `rgba(${color.r},${color.g},${color.g},1`;
