@@ -26,6 +26,9 @@ inputY.addEventListener('change', (evt) => {
 
 inputZoom.addEventListener('change', (evt) => {
   zoom = evt.target.value;
+canvas.addEventListener('click', e => {
+  console.log(`Clicked on coordinates ${e.x},${e.y}`);
+  console.log(`In the complex space these are ${e.x/zoom},${e.y/zoom}`);
 });
 
 drawButton.addEventListener('click', () => {
@@ -38,7 +41,7 @@ resetButton.addEventListener('click', () => {
 });
 
 // Computational constants
-const maxIterations = 1000;
+const maxIterations = 2000;
 
 function resetScreen() {
 
@@ -46,9 +49,9 @@ function resetScreen() {
   inputY.value = 1.5;
   inputZoom.value = 300;
 
-  zoom = inputZoom.value;
-  panX = inputX.value;
-  panY = inputY.value;
+  zoom = parseFloat(inputZoom.value);
+  panX = parseFloat(inputX.value);
+  panY = parseFloat(inputY.value);
 
 }
 
@@ -72,7 +75,7 @@ function calculateEscapeValue(x, y) {
     cX = newCx;
     cY = newCy;
 
-    if ((cX * cY) > 5) {
+    if ((cX * cY) > 2) {
       // Number is outside of the set if it has not escaped
       return i / maxIterations * 100;
     }
@@ -94,7 +97,7 @@ function drawCanvas() {
       if (escValue === 0) {
         drawPixel(i, j, { h: 0, s: 0, l: 0 });
       } else {
-        drawPixel(i, j, { h: 0, s: 100, l: escValue });
+        drawPixel(i, j, { h: escValue * maxIterations % 360, s: 100, l: escValue });
       }
 
     }
