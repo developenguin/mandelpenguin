@@ -17,18 +17,20 @@ let panY;
 
 // Respond to change
 inputX.addEventListener('change', (evt) => {
-  panX = evt.target.value;
+  panX = parseFloat(evt.target.value);
 });
 
 inputY.addEventListener('change', (evt) => {
-  panY = evt.target.value;
+  panY = parseFloat(evt.target.value);
 });
 
 inputZoom.addEventListener('change', (evt) => {
-  zoom = evt.target.value;
+  zoom = parseFloat(evt.target.value);
+});
+
 canvas.addEventListener('click', e => {
-  console.log(`Clicked on coordinates ${e.x},${e.y}`);
-  console.log(`In the complex space these are ${e.x/zoom},${e.y/zoom}`);
+  console.log(`Clicked on coordinates ${e.layerX},${e.layerY}`);
+  console.log(`In the complex space these are ${e.layerX/zoom - panX},${e.layerY/zoom - panY}`);
 });
 
 drawButton.addEventListener('click', () => {
