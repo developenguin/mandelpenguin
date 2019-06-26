@@ -1,6 +1,13 @@
 
 // Canvas and inputs
+
+const canvasHalfWidth = 400;
+const canvasHalfHeight = 400;
 const canvas = document.getElementById('mandelbrot');
+
+canvas.width = canvasHalfWidth * 2;
+canvas.height = canvasHalfHeight * 2;
+
 const ctx = canvas.getContext('2d');
 
 const inputX = document.getElementById('xvalue');
@@ -12,16 +19,17 @@ const resetButton = document.getElementById('reset');
 
 // Position and zoom
 let zoom;
-let panX;
-let panY;
+
+let middleX;
+let middleY;
 
 // Respond to change
 inputX.addEventListener('change', (evt) => {
-  panX = parseFloat(evt.target.value);
+  middleX = parseFloat(evt.target.value);
 });
 
 inputY.addEventListener('change', (evt) => {
-  panY = parseFloat(evt.target.value);
+  middleY = parseFloat(evt.target.value);
 });
 
 inputZoom.addEventListener('change', (evt) => {
@@ -29,8 +37,18 @@ inputZoom.addEventListener('change', (evt) => {
 });
 
 canvas.addEventListener('click', e => {
-  console.log(`Clicked on coordinates ${e.layerX},${e.layerY}`);
-  console.log(`In the complex space these are ${e.layerX/zoom - panX},${e.layerY/zoom - panY}`);
+
+  const clickX = e.layerX;
+  const clickY = e.layerY;
+
+  middleX = (clickX - canvasHalfWidth) / zoom + middleX;
+  middleY = (clickY - canvasHalfHeight) / zoom + middleY;
+
+  inputX.value = middleX;
+  inputY.value = middleY;
+
+  drawCanvas();
+
 });
 
 drawButton.addEventListener('click', () => {
@@ -47,13 +65,13 @@ const maxIterations = 2000;
 
 function resetScreen() {
 
-  inputX.value = 2;
-  inputY.value = 1.5;
+  inputX.value = 0.0;
+  inputY.value = 0.0;
   inputZoom.value = 300;
 
   zoom = parseFloat(inputZoom.value);
-  panX = parseFloat(inputX.value);
-  panY = parseFloat(inputY.value);
+  middleX = parseFloat(inputX.value);
+  middleY = parseFloat(inputY.value);
 
 }
 
@@ -91,15 +109,17 @@ function calculateEscapeValue(x, y) {
 
 function drawCanvas() {
 
-  for (let i = 0; i < canvas.width; i++) {
-    for (let j = 0; j < canvas.height; j++) {
+  // We start at -canvasHalfWidth and height to have the middle of the canvas be the
+  // middle of the complex space.
+  for (let i = -canvasHalfWidth; i < canvasHalfWidth; i++) {
+    for (let j = -canvasHalfHeight; j < canvasHalfHeight; j++) {
 
-      const escValue = calculateEscapeValue(i/zoom - panX, j/zoom - panY);
+      const escValue = calculateEscapeValue(i/zoom + middleX, j/zoom + middleY);
 
       if (escValue === 0) {
-        drawPixel(i, j, { h: 0, s: 0, l: 0 });
+        drawPixel(i + canvasHalfWidth, j + canvasHalfHeight, { h: 0, s: 0, l: 0 });
       } else {
-        drawPixel(i, j, { h: escValue * maxIterations % 360, s: 100, l: escValue });
+        drawPixel(i + canvasHalfWidth, j + canvasHalfHeight, { h: escValue * maxIterations % 360, s: 100, l: escValue });
       }
 
     }
