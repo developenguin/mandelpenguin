@@ -13,6 +13,7 @@ const ctx = canvas.getContext('2d');
 const inputX = document.getElementById('xvalue');
 const inputY = document.getElementById('yvalue');
 const inputZoom = document.getElementById('zoom');
+const inputMaxIterations = document.getElementById('max');
 
 const drawButton = document.getElementById('draw');
 const resetButton = document.getElementById('reset');
@@ -21,6 +22,7 @@ const zoomOutButton = document.getElementById('zoomout');
 
 // Position and zoom
 let zoom;
+let maxIterations;
 
 let middleX;
 let middleY;
@@ -35,7 +37,11 @@ inputY.addEventListener('change', (evt) => {
 });
 
 inputZoom.addEventListener('change', (evt) => {
-  zoom = parseFloat(evt.target.value);
+  zoom = parseInt(evt.target.value);
+});
+
+inputMaxIterations.addEventListener('change', (evt) => {
+  maxIterations = parseInt(evt.target.value);
 });
 
 canvas.addEventListener('click', e => {
@@ -74,16 +80,15 @@ resetButton.addEventListener('click', () => {
   drawCanvas();
 });
 
-// Computational constants
-const maxIterations = 2000;
-
 function resetScreen() {
 
   inputX.value = 0.0;
   inputY.value = 0.0;
   inputZoom.value = 300;
+  inputMaxIterations.value = 3000;
 
-  zoom = parseFloat(inputZoom.value);
+  zoom = parseInt(inputZoom.value);
+  maxIterations = parseInt(inputMaxIterations.value);
   middleX = parseFloat(inputX.value);
   middleY = parseFloat(inputY.value);
 
