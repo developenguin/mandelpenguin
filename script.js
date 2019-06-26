@@ -16,6 +16,8 @@ const inputZoom = document.getElementById('zoom');
 
 const drawButton = document.getElementById('draw');
 const resetButton = document.getElementById('reset');
+const zoomInButton = document.getElementById('zoomin');
+const zoomOutButton = document.getElementById('zoomout');
 
 // Position and zoom
 let zoom;
@@ -49,6 +51,18 @@ canvas.addEventListener('click', e => {
 
   drawCanvas();
 
+});
+
+zoomInButton.addEventListener('click', () => {
+  zoom *= 2;
+  inputZoom.value = zoom;
+  drawCanvas();
+});
+
+zoomOutButton.addEventListener('click', () => {
+  zoom /= 2;
+  inputZoom.value = zoom;
+  drawCanvas();
 });
 
 drawButton.addEventListener('click', () => {
