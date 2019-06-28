@@ -115,7 +115,7 @@ function calculateEscapeValue(x, y) {
     cY = newCy;
 
     if ((cX * cY) > 2) {
-      // Number is outside of the set if it has not escaped
+      // Number is inside of the set if it has not escaped
       return i / maxIterations * 100;
     }
 
