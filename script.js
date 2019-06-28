@@ -55,29 +55,29 @@ canvas.addEventListener('click', e => {
   inputX.value = middleX;
   inputY.value = middleY;
 
-  drawCanvas();
+  startDrawingCanvas();
 
 });
 
 zoomInButton.addEventListener('click', () => {
   zoom *= 2;
   inputZoom.value = zoom;
-  drawCanvas();
+  startDrawingCanvas();
 });
 
 zoomOutButton.addEventListener('click', () => {
   zoom /= 2;
   inputZoom.value = zoom;
-  drawCanvas();
+  startDrawingCanvas();
 });
 
 drawButton.addEventListener('click', () => {
-  drawCanvas();
+  startDrawingCanvas();
 });
 
 resetButton.addEventListener('click', () => {
   resetScreen();
-  drawCanvas();
+  startDrawingCanvas();
 });
 
 function resetScreen() {
@@ -126,6 +126,47 @@ function calculateEscapeValue(x, y) {
 
 }
 
+function drawCanvasUsingWorkers() {
+
+  // We start at -canvasHalfWidth and height to have the middle of the canvas be the
+  // middle of the complex space.
+  for (let i = -canvasHalfWidth; i < canvasHalfWidth; i++) {
+
+    const worker = new Worker('worker.js');
+
+    worker.onmessage = function(evt) {
+
+      const column = evt.data;
+
+      column.forEach(pixel => {
+
+        const { x, y, escValue } = pixel;
+
+        if (escValue === 0) {
+          drawPixel(x + canvasHalfWidth, y + canvasHalfHeight, { h: 0, s: 0, l: 0 });
+        } else {
+          drawPixel(x + canvasHalfWidth, y + canvasHalfHeight, { h: escValue * maxIterations % 360, s: 100, l: escValue });
+        }
+
+      });
+
+      worker.terminate();
+
+    };
+
+    worker.postMessage({
+      zoom,
+      middleX,
+      middleY,
+      maxIterations,
+      canvasHalfHeight,
+      x: i
+    });
+
+  }
+
+}
+
 function drawCanvas() {
 
   // We start at -canvasHalfWidth and height to have the middle of the canvas be the
@@ -146,5 +187,17 @@ function drawCanvas() {
 
 }
 
+function startDrawingCanvas() {
+
+  const isUseWorkers = document.getElementById('workers').checked;
+
+  if (isUseWorkers) {
+    drawCanvasUsingWorkers();
+  } else {
+    drawCanvas();
+  }
+
+}
+
 resetScreen();
-drawCanvas();
+startDrawingCanvas();
