@@ -1,6 +1,11 @@
 
 onmessage = function(evt) {
 
+  if (evt.data.isStartMessage) {
+    postMessage({ started: true });
+    return;
+  }
+
   const { y, x, zoom, middleX, middleY, maxIterations } = evt.data;
 
   postMessage({
