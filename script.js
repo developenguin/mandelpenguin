@@ -126,44 +126,55 @@ function calculateEscapeValue(x, y) {
 
 }
 
-function drawCanvasUsingWorkers() {
+function drawCanvasUsingWorker() {
 
-  // We start at -canvasHalfWidth and height to have the middle of the canvas be the
-  // middle of the complex space.
-  for (let i = -canvasHalfWidth; i < canvasHalfWidth; i++) {
+  let x = -canvasHalfWidth;
+  let y = -canvasHalfHeight;
 
-    const worker = new Worker('worker.js');
+  const worker = new Worker('worker.js');
 
-    worker.onmessage = function(evt) {
+  worker.onmessage = function(evt) {
 
-      const column = evt.data;
+    const pixel = evt.data;
+    const { px, py, escValue } = pixel;
 
-      column.forEach(pixel => {
+    if (escValue === 0) {
+      drawPixel(px + canvasHalfWidth, py + canvasHalfHeight, { h: 0, s: 0, l: 0 });
+    } else {
+      drawPixel(px + canvasHalfWidth, py + canvasHalfHeight, { h: escValue * maxIterations % 360, s: 100, l: escValue });
+    }
 
-        const { x, y, escValue } = pixel;
-
-        if (escValue === 0) {
-          drawPixel(x + canvasHalfWidth, y + canvasHalfHeight, { h: 0, s: 0, l: 0 });
-        } else {
-          drawPixel(x + canvasHalfWidth, y + canvasHalfHeight, { h: escValue * maxIterations % 360, s: 100, l: escValue });
-        }
-
-      });
-
+    if (x === canvasHalfWidth && y === canvasHalfHeight) {
       worker.terminate();
+      return;
+    }
 
-    };
+    if (y < canvasHalfHeight) {
+      y++;
+    } else {
+      y = -canvasHalfHeight;
+      x++;
+    }
 
     worker.postMessage({
       zoom,
       middleX,
       middleY,
       maxIterations,
-      canvasHalfHeight,
-      x: i
+      x,
+      y
     });
 
-  }
+  };
+
+  worker.postMessage({
+    zoom,
+    middleX,
+    middleY,
+    maxIterations,
+    x,
+    y
+  });
 
 }
 
@@ -192,7 +203,7 @@ function startDrawingCanvas() {
   const isUseWorkers = document.getElementById('workers').checked;
 
   if (isUseWorkers) {
-    drawCanvasUsingWorkers();
+    drawCanvasUsingWorker();
   } else {
     drawCanvas();
   }
