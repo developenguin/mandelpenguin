@@ -126,54 +126,72 @@ function calculateEscapeValue(x, y) {
 
 }
 
-function drawCanvasUsingWorker() {
+// Maximum parallel workers
+const poolSize = 5;
+
+function drawCanvasUsingWorkers() {
 
   let x = -canvasHalfWidth;
   let y = -canvasHalfHeight;
 
-  const worker = new Worker('worker.js');
+  const workers = [];
 
-  worker.onmessage = function(evt) {
+  let i = 0;
 
-    const pixel = evt.data;
-    const { px, py, escValue } = pixel;
+  // build worker pool
+  while (i < poolSize) {
 
-    if (escValue === 0) {
-      drawPixel(px + canvasHalfWidth, py + canvasHalfHeight, { h: 0, s: 0, l: 0 });
-    } else {
-      drawPixel(px + canvasHalfWidth, py + canvasHalfHeight, { h: escValue * maxIterations % 360, s: 100, l: escValue });
-    }
+    const worker = new Worker('worker.js');
 
-    if (x === canvasHalfWidth && y === canvasHalfHeight) {
-      worker.terminate();
-      return;
-    }
+    worker.onmessage = function(evt) {
 
-    if (y < canvasHalfHeight) {
-      y++;
-    } else {
-      y = -canvasHalfHeight;
-      x++;
-    }
+      if (evt.data.isStarted) {
 
-    worker.postMessage({
-      zoom,
-      middleX,
-      middleY,
-      maxIterations,
-      x,
-      y
-    });
+      } else {
 
-  };
+        const pixel = evt.data;
+        const { px, py, escValue } = pixel;
 
-  worker.postMessage({
-    zoom,
-    middleX,
-    middleY,
-    maxIterations,
-    x,
-    y
+        if (escValue === 0) {
+          drawPixel(px + canvasHalfWidth, py + canvasHalfHeight, { h: 0, s: 0, l: 0 });
+        } else {
+          drawPixel(px + canvasHalfWidth, py + canvasHalfHeight, { h: escValue * maxIterations % 360, s: 100, l: escValue });
+        }
+
+      }
+
+      if (x === canvasHalfWidth && y === canvasHalfHeight) {
+        worker.terminate();
+        return;
+      }
+
+      if (y < canvasHalfHeight) {
+        y++;
+      } else {
+        y = -canvasHalfHeight;
+        x++;
+      }
+
+      worker.postMessage({
+        zoom,
+        middleX,
+        middleY,
+        maxIterations,
+        x,
+        y
+      });
+
+    };
+
+    workers.push(worker);
+
+    i++;
+
+  }
+
+  // Start the workers with an empty message so they can pick up coordinates on their own
+  workers.forEach(worker => {
+    worker.postMessage({ isStartMessage: true });
   });
 
 }
@@ -203,7 +221,7 @@ function startDrawingCanvas() {
   const isUseWorkers = document.getElementById('workers').checked;
 
   if (isUseWorkers) {
-    drawCanvasUsingWorker();
+    drawCanvasUsingWorkers();
   } else {
     drawCanvas();
   }
