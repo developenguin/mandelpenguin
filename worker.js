@@ -1,25 +1,17 @@
 
 onmessage = function(evt) {
 
-  const { canvasHalfHeight, x, zoom, middleX, middleY, maxIterations } = evt.data;
+  const { y, x, zoom, middleX, middleY, maxIterations } = evt.data;
 
-  const column = [];
-
-  for (let y = -canvasHalfHeight; y < canvasHalfHeight; y++) {
-
-    column.push({
-      x,
-      y,
-      escValue: calculateEscapeValue({
-        x: x/zoom + middleX,
-        y: y/zoom + middleY,
-        maxIterations
-      })
-    });
-
-  }
-
-  postMessage(column);
+  postMessage({
+    px: x,
+    py: y,
+    escValue: calculateEscapeValue({
+      x: x/zoom + middleX,
+      y: y/zoom + middleY,
+      maxIterations
+    })
+  });
 
 };
 
