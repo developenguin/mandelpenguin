@@ -2,7 +2,7 @@
 onmessage = function(evt) {
 
   if (evt.data.isStartMessage) {
-    postMessage({ started: true });
+    postMessage({ isStarted: true });
     return;
   }
 
