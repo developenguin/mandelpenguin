@@ -131,7 +131,6 @@ const poolSize = 5;
 
 function drawCanvasUsingWorkers() {
 
-  let x = -canvasHalfWidth;
   let y = -canvasHalfHeight;
 
   const workers = [];
@@ -149,27 +148,22 @@ function drawCanvasUsingWorkers() {
 
       } else {
 
-        const pixel = evt.data;
-        const { px, py, escValue } = pixel;
+        const row = evt.data.row;
+        const array = new Uint8ClampedArray(row);
 
-        if (escValue === 0) {
-          drawPixel(px + canvasHalfWidth, py + canvasHalfHeight, { h: 0, s: 0, l: 0 });
-        } else {
-          drawPixel(px + canvasHalfWidth, py + canvasHalfHeight, { h: escValue * maxIterations % 360, s: 100, l: escValue });
-        }
+        const imageData = new ImageData(array, canvasHalfWidth * 2, 1);
+
+        ctx.putImageData(imageData,0, y + canvasHalfHeight);
 
       }
 
-      if (x === canvasHalfWidth && y === canvasHalfHeight) {
+      if (y === canvasHalfHeight) {
         worker.terminate();
         return;
       }
 
       if (y < canvasHalfHeight) {
         y++;
-      } else {
-        y = -canvasHalfHeight;
-        x++;
       }
 
       worker.postMessage({
@@ -177,8 +171,8 @@ function drawCanvasUsingWorkers() {
         middleX,
         middleY,
         maxIterations,
-        x,
-        y
+        y,
+        canvasHalfHeight
       });
 
     };
