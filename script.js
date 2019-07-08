@@ -9,6 +9,8 @@ canvas.width = canvasHalfWidth * 2;
 canvas.height = canvasHalfHeight * 2;
 
 const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = true;
+ctx.imageSmoothingQuality = 'high';
 
 const inputX = document.getElementById('xvalue');
 const inputY = document.getElementById('yvalue');
