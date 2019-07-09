@@ -1,7 +1,7 @@
 
 // Canvas and inputs
 
-const canvasHalfWidth = 400;
+const canvasHalfWidth = 640;
 const canvasHalfHeight = 400;
 const canvas = document.getElementById('mandelbrot');
 
@@ -174,7 +174,7 @@ function drawCanvasUsingWorkers() {
         middleY,
         maxIterations,
         y,
-        canvasHalfHeight
+        canvasHalfWidth
       });
 
     };
